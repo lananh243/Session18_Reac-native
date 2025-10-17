@@ -12,7 +12,7 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
   (config) => {
     const accessToken =
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjU4LCJyb2xlIjoiS2jDoWNoIGjDoG5nIiwic3RhdHVzIjoiQUNUSVZFIiwiZGV2aWNlSWQiOiIxZjAyNWU5NC0zNGEwLTZlZTAtOWVhOC0zMGJiMjA0MjMyY2YiLCJpYXQiOjE3NjA2NzEzNjksImV4cCI6MTc2MDY3MzE2OX0.TYq68iaMilzP6-KDYjblUKhWJWPIblhoHUGwAbds_uA";
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjU4LCJyb2xlIjoiS2jDoWNoIGjDoG5nIiwic3RhdHVzIjoiQUNUSVZFIiwiZGV2aWNlSWQiOiIxZjAyNWU5NC0zNGEwLTZlZTAtOWVhOC0zMGJiMjA0MjMyY2YiLCJpYXQiOjE3NjA2NzU4MDIsImV4cCI6MTc2MDY3NzYwMn0.BQeHY5u7LWz0caLgeh0vel2aLoDwRYP5zH0W9T_vV9A";
     if (accessToken) {
       config.headers["Authorization"] = `Bearer ${accessToken}`;
     }
@@ -39,7 +39,7 @@ axiosInstance.interceptors.response.use(
           "https://nest-api-public.ixe-agent.io.vn/api/v1/auths/refresh-token",
           {
             refreshToken:
-              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjU4LCJpYXQiOjE3NjA2NzEzNjksImV4cCI6MTc2MTI3NjE2OX0.CSEEp32cOK6PxmF1efS7Rac5XzrDW6MuyZoq_67Uq_g",
+              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjU4LCJpYXQiOjE3NjA2NzU4MDIsImV4cCI6MTc2MTI4MDYwMn0.qCmamCTUqIZ9vhA-Jf394qJGfRBoCITaVkTI3ixCwpE",
           }
         );
 

@@ -5,6 +5,7 @@ import { Stack } from "expo-router";
 import React from "react";
 import {
   ActivityIndicator,
+  Alert,
   FlatList,
   Image,
   StyleSheet,
@@ -16,66 +17,82 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 // Dữ liệu giỏ hàng fix cứng
-const CART_ITEMS = [
-  {
-    id: "1",
-    name: "Áo thun Premium Slim Fit",
-    price: 350000,
-    quantity: 1,
-    image:
-      "https://product.hstatic.net/200000471735/product/mts215s5-2-w01_3__fabd997abd6841eca0efa71ddaa2319f.jpg",
-  },
-  {
-    id: "2",
-    name: "Ổ cứng di động WD 2TB",
-    price: 1850000,
-    quantity: 2,
-    image:
-      "https://western.com.vn/media/product/49_hdd_wd_elements_2tb_25_inch_wdbu6y0020bbk__2_.jpg",
-  },
-  {
-    id: "3",
-    name: "Vòng tay rồng John Hardy",
-    price: 12500000,
-    quantity: 1,
-    image:
-      "https://cdn.xaxi.vn/trangsuc/img/john-hardy-modern-chain-mens-bracelet-bmp9995362dixm.jpg",
-  },
-];
+// const CART_ITEMS = [
+//   {
+//     id: "1",
+//     name: "Áo thun Premium Slim Fit",
+//     price: 350000,
+//     quantity: 1,
+//     image:
+//       "https://product.hstatic.net/200000471735/product/mts215s5-2-w01_3__fabd997abd6841eca0efa71ddaa2319f.jpg",
+//   },
+//   {
+//     id: "2",
+//     name: "Ổ cứng di động WD 2TB",
+//     price: 1850000,
+//     quantity: 2,
+//     image:
+//       "https://western.com.vn/media/product/49_hdd_wd_elements_2tb_25_inch_wdbu6y0020bbk__2_.jpg",
+//   },
+//   {
+//     id: "3",
+//     name: "Vòng tay rồng John Hardy",
+//     price: 12500000,
+//     quantity: 1,
+//     image:
+//       "https://cdn.xaxi.vn/trangsuc/img/john-hardy-modern-chain-mens-bracelet-bmp9995362dixm.jpg",
+//   },
+// ];
 
 // type CartItemType = (typeof CART_ITEMS)[number];
 // type CartItemProps = { item: CartItemType };
 
-const CartItem: React.FC<CartItemProps> = ({ item, onRemove }) => (
+const CartItem: React.FC<CartItemProps> = ({ item, onRemove }) => {
+  const { updateQuantity } = useCart();
 
-  <View style={styles.itemContainer}>
-    <Image
-      source={{ uri: item.image }}
-      style={styles.itemImage}
-      resizeMode="contain"
-    />
-    <View style={styles.itemDetails}>
-      <Text style={styles.itemName} numberOfLines={2}>
-        {item.name}
-      </Text>
-      <Text style={styles.itemPrice}>
-        {item.price.toLocaleString("vi-VN")} VNĐ
-      </Text>
-      <View style={styles.quantityContainer}>
-        <TouchableOpacity>
-          <Ionicons name="remove-circle-outline" size={28} color="#555" />
-        </TouchableOpacity>
-        <Text style={styles.quantityText}>{item.quantity}</Text>
-        <TouchableOpacity>
-          <Ionicons name="add-circle-outline" size={28} color="#555" />
-        </TouchableOpacity>
+  const handleIncrease = () => {
+    updateQuantity({ id: item.id, quantity: item.quantity + 1 });
+  };
+
+  const handleDecrease = () => {
+    if (item.quantity > 1) {
+      updateQuantity({ id: item.id, quantity: item.quantity - 1 });
+    } else {
+      Alert.alert("Thông báo", "Số lượng không thể nhỏ hơn 1");
+    }
+  };
+
+  return (
+    <View style={styles.itemContainer}>
+      <Image
+        source={{ uri: item.productImage }}
+        style={styles.itemImage}
+        resizeMode="contain"
+      />
+      <View style={styles.itemDetails}>
+        <Text style={styles.itemName} numberOfLines={2}>
+          {item.productName}
+        </Text>
+        <Text style={styles.itemPrice}>
+          {item.price.toLocaleString("vi-VN")} VNĐ
+        </Text>
+        <View style={styles.quantityContainer}>
+          <TouchableOpacity onPress={handleDecrease}>
+            <Ionicons name="remove-circle-outline" size={28} color="#555" />
+          </TouchableOpacity>
+          <Text style={styles.quantityText}>{item.quantity}</Text>
+          <TouchableOpacity onPress={handleIncrease}>
+            <Ionicons name="add-circle-outline" size={28} color="#555" />
+          </TouchableOpacity>
+        </View>
       </View>
+      <TouchableOpacity onPress={onRemove}>
+        <Ionicons name="trash-outline" size={24} color="#e53e3e" />
+      </TouchableOpacity>
     </View>
-    <TouchableOpacity>
-      <Ionicons name="trash-outline" size={24} color="#e53e3e" />
-    </TouchableOpacity>
-  </View>
-);
+  );
+};
+
 
 const CartSummary = () => (
   <View style={styles.summaryContainer}>
@@ -96,7 +113,7 @@ const CartSummary = () => (
 );
 
 export default function CartScreen() {
-  const { cart, isLoading, removeFromCart } = useCart();
+  const { cart, isLoading, removeFromCart, clearCart } = useCart();
   if (isLoading) {
     return <ActivityIndicator size="large" style={{ flex: 1 }} />;
   }
@@ -104,10 +121,38 @@ export default function CartScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <Stack.Screen options={{ title: "Giỏ hàng của bạn" }} />
+
+      {cart?.data?.cartItems?.length > 0 && (
+    <TouchableOpacity
+      style={styles.clearButton}
+      onPress={() => {
+        Alert.alert(
+          "Xác nhận",
+          "Bạn có chắc muốn xóa toàn bộ giỏ hàng không?",
+          [
+            { text: "Hủy" },
+            { text: "Xóa tất cả", style: "destructive", onPress: () => clearCart() },
+          ]
+        );
+      }}
+    >
+      <Text style={styles.clearButtonText}>🗑️ Xóa toàn bộ giỏ hàng</Text>
+    </TouchableOpacity>
+  )}
       <FlatList
-        data={cart}
-        renderItem={({ item }) => <CartItem item={item} onRemove={() => removeFromCart(item.id)}/>}
-        keyExtractor={(item) => item.id}
+        data={cart?.data?.cartItems || []}
+        renderItem={({ item }) => <CartItem item={item} 
+          onRemove={() => {
+              Alert.alert(
+                "Xác nhận",
+                "Bạn có chắc muốn xóa sản phẩm này?",
+                [
+                  { text: "Hủy" },
+                  { text: "Xóa", onPress: () => removeFromCart(item.id) },
+                ]
+              );
+            }}/>}
+        keyExtractor={(item) => item.id.toString()}
         ListFooterComponent={<CartSummary />}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
@@ -169,5 +214,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 4,
     color: "#333",
+  },
+  clearButton: {
+  backgroundColor: "#ffe6e6",
+  padding: 12,
+  marginHorizontal: 15,
+  marginTop: 10,
+  borderRadius: 10,
+  alignItems: "center",
+  },
+  clearButtonText: {
+    color: "#e53e3e",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });

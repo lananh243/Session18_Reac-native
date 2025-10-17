@@ -15,11 +15,11 @@ export type ProductCardProps = {
 
 
 export type CartItemType = {
-  id: string;
-  name: string;
+  id: number;
+  productName: string;
+  productImage: string;
   price: number;
   quantity: number;
-  image: string;
 };
 
 export type CartItemProps = {
